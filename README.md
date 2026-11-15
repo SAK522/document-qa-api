@@ -111,7 +111,7 @@ flowchart LR
 - Deleting a document deletes all of its chunks and vectors (cascading delete).
 - Guards against prompt injection: document text is passed to the LLM as delimited, untrusted content it must not obey.
 - Detects when the embedding model has changed since a document was indexed, and asks for a re-upload instead of returning meaningless results.
-- 60 automated tests, including a mocked LLM, so the suite needs no network or keys.
+- 62 automated tests, including a mocked LLM, so the suite needs no network or keys.
 
 ## API endpoints
 
@@ -214,7 +214,7 @@ app/
     answer.py           extractive + OpenAI-compatible LLM answerers, grounding prompt
     providers.py        builds the configured providers (FastAPI dependencies)
     pipeline.py         index_document, answer_question
-tests/                  60 pytest tests
+tests/                  62 pytest tests
 sample_docs/            fictional demo PDF
 scripts/                demo.py (guided end-to-end demo), make_sample_pdf.py
 run-local.bat           one-click local demo on Windows
