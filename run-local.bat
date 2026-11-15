@@ -27,9 +27,9 @@ start "Document Q&A API server" cmd /k ".venv\Scripts\python.exe -m uvicorn app.
 echo Waiting for the server, then running the guided demo...
 ".venv\Scripts\python.exe" scripts\demo.py http://127.0.0.1:8000 || goto fail
 
-start "" http://127.0.0.1:8000/docs
+start "" http://127.0.0.1:8000/
 echo.
-echo The interactive API docs are open in your browser.
+echo The web app is open in your browser (API docs: http://127.0.0.1:8000/docs).
 echo Close the "Document Q&A API server" window to stop the API.
 pause
 exit /b 0

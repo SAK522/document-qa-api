@@ -4,8 +4,11 @@ Upload a PDF or text file, then ask questions about it in plain English. The API
 
 Built with **FastAPI**, **SQLAlchemy** and **PostgreSQL**, with a retrieval-augmented generation (RAG) pipeline written from scratch: text extraction, chunking, embeddings, vector search and grounded answer generation.
 
-- **Live API:** `https://<your-service>.onrender.com` ← add after deploying
-- **Interactive docs:** `https://<your-service>.onrender.com/docs`
+- **Web app (no coding needed):** https://document-qa-api-jhim.onrender.com
+- **Interactive API docs (for developers):** https://document-qa-api-jhim.onrender.com/docs
+- **Run the guided demo against it:** `python scripts/demo.py https://document-qa-api-jhim.onrender.com`
+
+> Free hosting: the first request after 15 idle minutes can take up to a minute while the server wakes up.
 
 ## Example
 
@@ -99,6 +102,7 @@ flowchart LR
 
 ## Features
 
+- **A web app for non-technical users** at `/`: one-click sample document, drag-and-drop upload, suggested questions, and answers that show their page, the sentence they came from (shaded green) and the matching words (highlighted). A private guest session is created automatically, with no sign-up.
 - Upload PDF, `.txt` or `.md` (up to 10 MB). Text is extracted per page so every answer cites a page.
 - Overlapping, page-aware chunking, so facts on a chunk boundary aren't lost and chunks never mix pages.
 - Pluggable embeddings and answer generation (see [AI providers](#ai-providers)). It **runs fully offline by default**, with no API key.
@@ -151,7 +155,7 @@ cp .env.example .env             # Windows: copy .env.example .env
 uvicorn app.main:app --reload
 ```
 
-Open http://127.0.0.1:8000/docs, sign up, log in, click **Authorize**, then upload [`sample_docs/lumenbay-hr-policy.pdf`](sample_docs/lumenbay-hr-policy.pdf), a fictional 4-page HR policy. Try:
+Open http://127.0.0.1:8000 for the web app. For the API itself, open http://127.0.0.1:8000/docs, sign up, log in, click **Authorize**, then upload [`sample_docs/lumenbay-hr-policy.pdf`](sample_docs/lumenbay-hr-policy.pdf), a fictional 4-page HR policy. Try:
 
 - *How many paid leaves do I get?*
 - *What is the notice period during probation?*
@@ -191,7 +195,8 @@ The suite uses an in-memory database and the offline providers. LLM and embeddin
 
 ```
 app/
-  main.py               app entry point, routers, /health
+  main.py               app entry point, routers, web app at /, /health
+  web/index.html        the web app (one self-contained page, no build step)
   config.py             settings from environment variables
   database.py           engine, sessions, get_db
   models.py             users, documents, chunks (with embeddings)
