@@ -107,7 +107,7 @@ flowchart LR
 - Deleting a document deletes all of its chunks and vectors (cascading delete).
 - Guards against prompt injection: document text is passed to the LLM as delimited, untrusted content it must not obey.
 - Detects when the embedding model has changed since a document was indexed, and asks for a re-upload instead of returning meaningless results.
-- 55 automated tests, including a mocked LLM, so the suite needs no network or keys.
+- 60 automated tests, including a mocked LLM, so the suite needs no network or keys.
 
 ## API endpoints
 
@@ -209,7 +209,7 @@ app/
     answer.py           extractive + OpenAI-compatible LLM answerers, grounding prompt
     providers.py        builds the configured providers (FastAPI dependencies)
     pipeline.py         index_document, answer_question
-tests/                  55 pytest tests
+tests/                  60 pytest tests
 sample_docs/            fictional demo PDF
 scripts/                demo.py (guided end-to-end demo), make_sample_pdf.py
 run-local.bat           one-click local demo on Windows
@@ -217,11 +217,15 @@ run-local.bat           one-click local demo on Windows
 
 ## Deploy to Render
 
-1. Push this repository to GitHub.
-2. In Render: **New → Blueprint**, then select the repository. `render.yaml` creates the web service and a PostgreSQL database.
-3. Optional: to use a real LLM, set `LLM_PROVIDER=openai`, `LLM_API_KEY`, `LLM_BASE_URL` and `LLM_MODEL` in the service's environment settings.
+Render allows one free PostgreSQL database per workspace, so this API shares the `portfolio-db` database created by the [Expense Tracker API](https://github.com/SAK522/expense-tracker-api) Blueprint. Each app keeps its tables in its own schema (`DATABASE_SCHEMA=docqa` here), so they never mix.
 
-Free-tier services sleep when idle (the first request afterwards is slow), and Render's free PostgreSQL databases expire after a limited period, so check Render's current free-tier terms.
+1. Deploy the Expense Tracker API Blueprint first (it creates `portfolio-db`), or create any PostgreSQL database.
+2. In Render: **New → Blueprint**, then select this repository.
+3. When asked for `DATABASE_URL`, paste the database's **Internal Database URL** (Render dashboard → `portfolio-db` → **Connect** → **Internal**).
+4. Wait for the build, then open `https://<your-service>.onrender.com/docs`, or run `python scripts/demo.py https://<your-service>.onrender.com`.
+5. Optional: to use a real LLM, set `LLM_PROVIDER=openai`, `LLM_API_KEY`, `LLM_BASE_URL` and `LLM_MODEL` in the service's environment settings.
+
+Free services sleep after 15 minutes without traffic and take up to a minute to wake, and free Render PostgreSQL databases expire 30 days after creation, so check Render's current free-tier terms.
 
 ## Future work
 

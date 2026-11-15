@@ -6,11 +6,11 @@ Run locally:  uvicorn app.main:app --reload     then open http://127.0.0.1:8000/
 from fastapi import Depends, FastAPI
 
 from app import models  # noqa: F401  (registers tables)
-from app.database import Base, engine
+from app.database import init_db
 from app.rag.providers import get_answerer, get_embedder
 from app.routers import auth, documents
 
-Base.metadata.create_all(bind=engine)
+init_db()
 
 app = FastAPI(
     title="Document Q&A API (RAG)",

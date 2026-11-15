@@ -13,7 +13,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     # --- database & auth -------------------------------------------------------------
     database_url: str = "sqlite:///./docqa.db"
-    jwt_secret: str = "dev-only-secret-change-me"
+    # Optional PostgreSQL schema. Lets several apps share one database (e.g. Render's single
+    # free Postgres) while keeping their tables completely separate.
+    database_schema: Optional[str] = None
+    jwt_secret: str = "dev-only-insecure-secret-change-me-in-production"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 
@@ -49,9 +52,16 @@ class Settings(BaseSettings):
 
     @property
     def sqlalchemy_url(self) -> str:
+        """Normalise the database URL for SQLAlchemy.
+
+        - Render/Heroku hand out 'postgres://', which SQLAlchemy doesn't accept.
+        - The driver is named explicitly ('+psycopg2'): SQLAlchemy 2.1 changed its default
+          PostgreSQL driver, so relying on the default would break when upgrading.
+        """
         url = self.database_url
-        if url.startswith("postgres://"):           # Render/Heroku style
-            url = url.replace("postgres://", "postgresql://", 1)
+        for prefix in ("postgres://", "postgresql://"):
+            if url.startswith(prefix):
+                return "postgresql+psycopg2://" + url[len(prefix):]
         return url
 
     @property

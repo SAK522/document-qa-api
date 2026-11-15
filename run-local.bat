@@ -1,6 +1,6 @@
 @echo off
 setlocal
-title Document Q&A API - local demo
+title Document Q^&A API - local demo
 cd /d "%~dp0"
 
 where python >nul 2>nul
@@ -17,7 +17,9 @@ if not exist ".venv\Scripts\python.exe" (
 )
 
 echo [2/3] Installing dependencies (first run takes a minute)...
-".venv\Scripts\python.exe" -m pip install -q --disable-pip-version-check -r requirements.txt || goto fail
+rem The PostgreSQL driver is only needed in production; locally the API uses SQLite.
+findstr /v /i "psycopg2" requirements.txt > "%TEMP%\docqa-requirements-local.txt"
+".venv\Scripts\python.exe" -m pip install -q --disable-pip-version-check -r "%TEMP%\docqa-requirements-local.txt" || goto fail
 
 echo [3/3] Starting the API in a new window...
 start "Document Q&A API server" cmd /k ".venv\Scripts\python.exe -m uvicorn app.main:app --port 8000"

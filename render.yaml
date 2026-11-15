@@ -1,7 +1,12 @@
-# Render Blueprint: creates the web service and a PostgreSQL database and wires them together.
-# In Render: New -> Blueprint -> select this repository.
-# Runs in offline mode (hash embeddings + extractive answers) until you add LLM_* variables
-# in the Render dashboard.
+# Render Blueprint for the Document Q&A API. In Render: New -> Blueprint -> select this repository.
+#
+# Render allows one free Postgres database per workspace, so this service shares the
+# `portfolio-db` database created by the expense-tracker-api Blueprint, in its own "docqa" schema.
+# When Render asks for DATABASE_URL, paste portfolio-db's *Internal Database URL*
+# (Render dashboard -> portfolio-db -> Connect -> Internal).
+#
+# Runs in offline mode (hash embeddings + extractive answers). To use a real LLM, set
+# LLM_PROVIDER=openai, LLM_API_KEY, LLM_BASE_URL and LLM_MODEL in the service's Environment settings.
 services:
   - type: web
     name: document-qa-api
@@ -15,15 +20,9 @@ services:
         value: 3.12.7
       - key: JWT_SECRET
         generateValue: true
+      - key: DATABASE_SCHEMA
+        value: docqa                 # this app's tables live in the "docqa" schema
       - key: DATABASE_URL
-        fromDatabase:
-          name: document-qa-db
-          property: connectionString
+        sync: false                  # Render asks for it when you create the Blueprint
       - key: LLM_PROVIDER
         value: extractive
-      - key: LLM_API_KEY
-        sync: false        # set it in the dashboard if you switch LLM_PROVIDER to openai
-
-databases:
-  - name: document-qa-db
-    plan: free
