@@ -38,6 +38,40 @@ Ask something the document doesn't cover, and it refuses instead of guessing:
 }
 ```
 
+## Try it in 2 minutes
+
+**Windows:** double-click [`run-local.bat`](run-local.bat). It creates a virtual environment, installs the dependencies, starts the API in its own window, runs a guided demo, and opens the interactive docs at http://127.0.0.1:8000/docs.
+
+**macOS / Linux:**
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app &          # start the API
+python scripts/demo.py          # guided end-to-end demo
+```
+
+The demo signs up a user, uploads the sample PDF, asks questions and checks privacy. Output (trimmed):
+
+```text
+== 3. Upload the sample PDF ==
+Indexed 'lumenbay-hr-policy.pdf': 4 pages -> 4 searchable chunks.
+
+== 4. Ask questions ==
+Q: How many paid leaves do I get?
+FOUND     Full-time employees receive 18 days of paid leave per calendar year, credited at 1.5 days
+          per month. (p. 2)
+          source: page 2, similarity 0.30
+
+Q: What is the company's stock price?
+NOT FOUND I couldn't find the answer to that in this document.
+
+== 5. Privacy check: a second user tries to read the document ==
+Second user gets HTTP 404 (expected 404: they can't even tell it exists).
+```
+
+Point it at a deployed copy with `python scripts/demo.py https://<your-service>.onrender.com`.
+
 ## How it works
 
 ```mermaid
@@ -177,7 +211,8 @@ app/
     pipeline.py         index_document, answer_question
 tests/                  55 pytest tests
 sample_docs/            fictional demo PDF
-scripts/                builds the demo PDF
+scripts/                demo.py (guided end-to-end demo), make_sample_pdf.py
+run-local.bat           one-click local demo on Windows
 ```
 
 ## Deploy to Render
